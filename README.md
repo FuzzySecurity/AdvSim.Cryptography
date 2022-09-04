@@ -12,7 +12,7 @@ The `AdvSim.Cryptography` NuGet contains a set of cryptographic wrapper function
     - [Multi-Byte XOR](#multi-byte-xor)
     - [XTEA](#xtea)
 - [Asymmetric](#asymmetric)
-    - [Elliptic-curve Diffie–Hellman (ECDH) to AES-CBC](#)
+    - [Elliptic-curve Diffie–Hellman (ECDH) to AES-CBC](#elliptic-curve-diffiehellman-ecdh-to-aes-cbc)
     - [RSA](#rsa)
 - [Windows Local](#windows-local)
     - [Entropy Generation](#entropy-generation)
