@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2022 AdvSim, Ruben Boonen
+Copyright (c) 2022 IBM AdvSim, Ruben Boonen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
