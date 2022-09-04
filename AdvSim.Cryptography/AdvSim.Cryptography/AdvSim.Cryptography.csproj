@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net35;net40;net452;net6.0-windows;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Title>Cryptographic Wrapper Library</Title>
+    <Authors>IBM AdvSim, Ruben Boonen (@FuzzySec)</Authors>
+    <Copyright>Copyright ©  2022</Copyright>
+    <PackageProjectUrl>https://github.com/FuzzySecurity/AdvSim.Cryptography</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FuzzySecurity/AdvSim.Cryptography</RepositoryUrl>
+    <PackageTags>Cryptography;AES;Triple DES;RC4;RC2;Multi-Byte XOR;XTEA;ECDH;RSA;DPAPI;TOTP</PackageTags>
+    <PackageReleaseNotes>Initial package release.</PackageReleaseNotes>
+    <Description>A simple and sane wrapper for a number of cryptographic functions in C#. Cryptographic operations include: AES, Triple DES, RC4, RC2, Multi-Byte XOR, XTEA, ECDH, RSA, DPAPI and TOTP.</Description>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <LangVersion>7.3</LangVersion>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Security" Condition="'$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net452'" />
+    <Reference Include="System.Security" Condition="'$(TargetFramework)' == 'net452' OR '$(TargetFramework)' == 'net35' OR '$(TargetFramework)' == 'net40'" />
+  </ItemGroup>
+
+</Project>
