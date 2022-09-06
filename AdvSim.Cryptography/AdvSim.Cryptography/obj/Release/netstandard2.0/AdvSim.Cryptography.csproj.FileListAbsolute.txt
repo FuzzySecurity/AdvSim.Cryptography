@@ -1,0 +1,9 @@
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\bin\Release\netstandard2.0\AdvSim.Cryptography.deps.json
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\bin\Release\netstandard2.0\AdvSim.Cryptography.dll
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\bin\Release\netstandard2.0\AdvSim.Cryptography.pdb
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.AssemblyInfoInputs.cache
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.AssemblyInfo.cs
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.csproj.CoreCompileInputs.cache
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.dll
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.pdb
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.csprojAssemblyReference.cache
