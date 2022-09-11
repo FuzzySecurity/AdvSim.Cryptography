@@ -27,6 +27,17 @@ namespace AdvSim.Cryptography.Symmetric
         {
             this.Key = Key;
             this.IV = IV;
+
+            if (Key.Length != 32)
+            {
+                throw new ArgumentException($"Key must be 32 bytes in length, but got {Key.Length}");
+            }
+
+            if (IV.Length != 16)
+            {
+                throw new ArgumentException($"IV must be 16 bytes in length, but got {Key.Length}");
+            }
+
             InitializeAes();
         }
 

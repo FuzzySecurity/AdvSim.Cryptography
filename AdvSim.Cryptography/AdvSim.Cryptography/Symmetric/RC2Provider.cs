@@ -27,6 +27,14 @@ namespace AdvSim.Cryptography.Symmetric
         {
             this.Key = Key;
             this.IV = IV;
+            if (Key.Length != 16)
+            {
+                throw new ArgumentException($"Key must be 16 bytes, but got {Key.Length}");
+            }
+            if (IV.Length != 8)
+            {
+                throw new ArgumentException($"IV must be 8 bytes, but got {IV.Length}");
+            }
             InitializeRC2();
         }
 

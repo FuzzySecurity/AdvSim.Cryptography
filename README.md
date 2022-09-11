@@ -4,7 +4,6 @@
 The `AdvSim.Cryptography` NuGet contains a set of cryptographic wrapper functions which are reusable, configured with sane defaults and are easy to use. Further details are available under the different subheadings below.
 
 - [Symmetric](#symmetric)
-    - [Key Material Generation](#key-material-generation)
     - [AES](#aes)
     - [Triple DES](#triple-des)
     - [RC4](#rc4)
@@ -15,7 +14,6 @@ The `AdvSim.Cryptography` NuGet contains a set of cryptographic wrapper function
     - [Elliptic-curve Diffie–Hellman (ECDH) to AES-CBC](#elliptic-curve-diffiehellman-ecdh-to-aes-cbc)
     - [RSA](#rsa)
 - [Windows Local](#windows-local)
-    - [Entropy Generation](#entropy-generation)
     - [DPAPI Local Machine](#dpapi-local-machine)
     - [DPAPI Current User](#dpapi-current-user)
 - [Miscellaneous](#miscellaneous)
@@ -29,93 +27,105 @@ The `AdvSim.Cryptography` NuGet supports a wide variety of .Net versions. Genera
 
 # Usage
 
-## Symmetric
+## AdvSim.Cryptography.Symmetric
 
-#### Key Material Generation
+### AES
 
 ![Availability](https://badgen.net/badge/Availability/All/green)
 
-`Symmetric.generateKeyMaterial` is used to generate all key material for the Symmetric cryptographic operations. This function takes a `String` seed input and the type of cryptographic operation for which the key material will be used. The returned key material is pseudo-random (using `Rfc2898DeriveBytes`). The key material is high quality but also using a string seed guarantees that if the function is called somewhere else with the same seed that the same key material will be generated.
+AES encryption is governed by the AESProvider class. The constructor takes a string password or from a provided key and initialization vector.
+
+#### Usage
 
 ```cs
-Object oAESKeyMat  = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.AES_CBC);
-Object oTDesKeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.TRIPLE_DES);
-Object oRC4KeyMat  = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.RC4);
-Object oRC2KeyMat  = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.RC2);
-Object oXorKeyMat  = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.MULTI_XOR);
-Object oXTEAKeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.XTEA);
+using System.Cryptography.Symmetric;
+
+AESProvider provider = new AESProvider("Hello World");
+byte[] bEnc = provider.Encrypt(
+    System.Text.Encoding.UTF8.GetBytes("My Secret Message")
+);
+byte[] bDec = provider.Decrypt(bEnc);
 ```
 
-#### AES
+### Triple DES
 
 ![Availability](https://badgen.net/badge/Availability/All/green)
 
-This function takes a byte array and will either encrypt or decrypt it using previously generated key material. On completion it will return a byte array.
+Triple DES encryption is goverened by the TripleDESProvider class. The constructor takes either a string password or from a provided key and initialization vector.
+
+#### Usage
 
 ```cs
-Object oAESKeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.AES_CBC);
-Byte[] bEnc = Symmetric.toAES(oAESKeyMat, bSampleData);
-Byte[] bDec = Symmetric.fromAES(oAESKeyMat, bEnc);
+using System.Cryptography.Symmetric;
+
+TripleDESProvider provider = new TripleDESProvider("Hello World");
+byte[] bEnc = provider.Encrypt(
+    System.Text.Encoding.UTF8.GetBytes("My Secret Message")
+);
+byte[] bDec = provider.Decrypt(bEnc);
 ```
 
-#### Triple DES
+### RC4
 
 ![Availability](https://badgen.net/badge/Availability/All/green)
 
-This function takes a byte array and will either encrypt or decrypt it using previously generated key material. On completion it will return a byte array.
+RC4 encryption is goverened by the RC4Provider class. The constructor takes either a string password or from a provided key.
+
+#### Usage
 
 ```cs
-Object oTDesKeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.TRIPLE_DES);
-Byte[] bEnc = Symmetric.toTripleDES(oTDesKeyMat, bSampleData);
-Byte[] bDec = Symmetric.fromTripleDES(oTDesKeyMat, bEnc);
+RC4Provider provider = new RC4Provider("Hello World");
+byte[] bEnc = provider.Encrypt(
+    System.Text.Encoding.UTF8.GetBytes("My Secret Message")
+);
+byte[] bDec = provider.Decrypt(bEnc);
 ```
 
-#### RC4
+### RC2
 
 ![Availability](https://badgen.net/badge/Availability/All/green)
 
-This function takes a byte array and will either encrypt or decrypt it using previously generated key material. On completion it will return a byte array.
+RC2 encryption is goverened by the RC2Provider class. The constructor takes either a string password or from a provided key and initialization vector.
+
+#### Usage
 
 ```cs
-Object oRC4KeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.RC4);
-Byte[] bEnc = Symmetric.toRC4(oRC4KeyMat, bSampleData);
-Byte[] bDec = Symmetric.fromRC4(oRC4KeyMat, bEnc);
+RC2Provider provider = new RC2Provider("Hello World");
+byte[] bEnc = provider.Encrypt(
+    System.Text.Encoding.UTF8.GetBytes("My Secret Message")
+);
+byte[] bDec = provider.Decrypt(bEnc);
 ```
 
-#### RC2
+### Multi-Byte XOR
 
 ![Availability](https://badgen.net/badge/Availability/All/green)
 
-This function takes a byte array and will either encrypt or decrypt it using previously generated key material. On completion it will return a byte array.
+Multi-Byte XOR encryption is goverened by the MultiByteXORProvider class. The constructor takes a string password and optional key length.
+
+#### Usage
 
 ```cs
-Object oRC2KeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.RC2);
-Byte[] bEnc = Symmetric.toRC2(oRC2KeyMat, bSampleData);
-Byte[] bDec = Symmetric.fromRC2(oRC2KeyMat, bEnc);
+MultiByteXORProvider provider = new MultiByteXORProvider("Hello World");
+byte[] bEnc = provider.Encrypt(
+    System.Text.Encoding.UTF8.GetBytes("My Secret Message")
+);
+byte[] bDec = provider.Decrypt(bEnc);
 ```
 
-#### Multi-Byte XOR
+### XTEA
 
 ![Availability](https://badgen.net/badge/Availability/All/green)
 
-This function takes a byte array and will either encrypt or decrypt it using previously generated key material. On completion it will return a byte array.
+XTEA encryption is goverened by the XTEAProvider class. The constructor takes a string password and optional key length.
 
+#### Usage
 ```cs
-Object oXorKeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.MULTI_XOR);
-Byte[] bEnc = Symmetric.toMultiXOR(oXorKeyMat, bSampleData);
-Byte[] bDec = Symmetric.fromMultiXOR(oXorKeyMat, bEnc);
-```
-
-#### XTEA
-
-![Availability](https://badgen.net/badge/Availability/All/green)
-
-This function takes a byte array and will either encrypt or decrypt it using previously generated key material. On completion it will return a byte array.
-
-```cs
-Object oXTEAKeyMat = Symmetric.generateKeyMaterial("Hello World", Symmetric.CryptographyType.XTEA);
-Byte[] bEnc = Symmetric.toXTEA(oXTEAKeyMat, bSampleData);
-Byte[] bDec = Symmetric.fromXTEA(oXTEAKeyMat, bEnc);
+XTEAProvider provider = new XTEAProvider("Hello World");
+byte[] bEnc = provider.Encrypt(
+    System.Text.Encoding.UTF8.GetBytes("My Secret Message")
+);
+byte[] bDec = provider.Decrypt(bEnc);
 ```
 
 ## Asymmetric
@@ -128,26 +138,54 @@ Note that this functionality requires two clients. It is ideal when negotiation 
 
 #### Usage
 
+The following example is pseudo-code to allow for client/server key exchange to negotiate a shared secret.
+
 ```cs
-// Both clients generate randomized key material
-ECDiffieHellmanCng oClient1ECDH = Asymmetric.initializeECDH();
-ECDiffieHellmanCng oClient2ECDH = Asymmetric.initializeECDH();
+using AdvSim.Cryptography.Asymmetric;
 
-// Both clients extract the public key from they key material
-// |_ These keys can be exchanged over a transport
-Byte[] bClient1PubKey = Asymmetric.getECDHPublicKey(oClient1ECDH);
-Byte[] bClient2PubKey = Asymmetric.getECDHPublicKey(oClient2ECDH);
+string message = "Keep me a secret!"
+byte[] bMessage = System.Text.Encoding.UTF8.GetBytes(message);
 
-// Both clients incorporate the public key of the other party to
-// derive a shared secret
-Asymmetric.ECDH_KEY_MAT oCLient1Shared = Asymmetric.deriveECDHSharedKeyMaterial(oClient1ECDH, bClient2PubKey);
-Asymmetric.ECDH_KEY_MAT oCLient2Shared = Asymmetric.deriveECDHSharedKeyMaterial(oClient2ECDH, bClient1PubKey);
+// Generate randomized key material
+ECDiffieHellmanProvider client = new ECDiffieHellmanProvider();
 
-// Client 1 uses AES-CBC to encrypt data using the shared secret
-Byte[] bEnc = Asymmetric.toECDH(oCLient1Shared, bSampleData);
+// Result of this function should be the server-side ECDiffieHellmanProvider's
+// public key. In this handshake exchange your client should send their
+// public key so the server can derive the shared secret.
+byte[] serverPublicKey = ExchangePublicKeys(client.GetPublicKey())
 
-// Client 2 uses AES-CBC to decrypt data using the shared secret
-Byte[] bDec = Asymmetric.fromECDH(oCLient2Shared, bEnc);
+client.DeriveSharedKey(serverPublicKey);
+
+// Say the server sends you some encrypted data and you pull those encrypted
+// bytes from the network.
+byte[] bEnc = GetServerMessage();
+// The client can now decrypt as the exchange has been performed.
+byte[] bDec = client.Decrypt(bEnc);
+
+string result = Encoding.UTF8.GetString(bDec);
+```
+
+The following example assumes the client and server cryptography providers are localized to your application.
+
+```cs
+using AdvSim.Cryptography.Asymmetric;
+
+string message = "Keep me a secret!"
+byte[] bMessage = System.Text.Encoding.UTF8.GetBytes(message);
+
+// Generate randomized key material
+ECDiffieHellmanProvider client = new ECDiffieHellmanProvider();
+ECDiffieHellmanProvider server = new ECDiffieHellmanProvider();
+
+// If localized, can use the static builtin helper function
+ECDiffieHellmanProvider.DeriveSharedKey(ref client, ref server);
+
+// Don't need to check result of client.Encrypt as testAfterDerivation should
+// do these sanity checks
+byte[] bEnc = client.Encrypt(_bMessage);
+byte[] bDec = server.Decrypt(bEnc);
+
+string result = Encoding.UTF8.GetString(bDec);
 ```
 
 ### RSA
@@ -159,56 +197,66 @@ Note that this functionality does not always require two clients since public ke
 #### Usage
 
 ```cs
+using AdvSim.Cryptography.Asymmetric;
+
+string message = "Hello world!";
+byte[] bMessage = System.Text.Encoding.UTF8.GetBytes(message);
+
 // The client initializes randomized key material
 // |_ Note that the return object has properties for the public
-//    and private keys
-Asymmetric.RSA_KEY_MAT oRSAKeyMat = Asymmetric.initializeRSA();
+//    and private keys, but only the public key is publicly
+//    accessible
+RSAProvider provider = new RSAProvider();
 
-// The RSA public key can be turned into a byte array and back
-// to an RSAParameters object for key exchange purposes
-Byte[] bRSAPubKey = Asymmetric.getArrayFromRSAParameters(oRSAKeyMat.oPublicKey);
-RSAParameters oPublicKey = Asymmetric.getRSAParametersFromArray(bRSAPubKey);
+// The RSA public key can be retrieved by the PublicKey attribute
+// on the class object, or exported as a byte array via the 
+// ExportPublicKey function.
+Byte[] bRSAPubKey = provider.ExportPublicKey();
+RSAParameters oPublicKey = provider.PublicKey;
+
+// If you have a key provided to you, you
+// can use an alternative constructor to initialize the RSAProvider
+byte[] bPublicKey = new byte[] { ... };
+byte[] bPrivateKey = new byte[] { ... };
+
+// Initialize RSAProvider with RSAParameters object
+RSAProvider encryptor = new RSAProvider(oPublicKey);
+// Initialize RSAProvider object with public key bytes to encrypt data.
+encryptor = new RSAProvider(bPublicKey);
+// Initialize RSAProvider object with private key bytes to encrypt/decrypt data.
+RSAProvider decryptor = new RSAProvider(bPrivateKey, false);
 
 // The client encrypts data using a public key
 // |_ Either the clients own key or one recieved over the wire
-Byte[] bEnc = Asymmetric.toRSA(oRSAKeyMat.oPublicKey, bSampleData);
-Byte[] bEnc = Asymmetric.toRSA(oPublicKey, bSampleData);
+Byte[] bEnc = provider.Encrypt(bMessage);
+bEnc = encryptor.Encrypt(bMessage);
 
 // The client decrypts data using their private key
-Byte[] bDec = Asymmetric.fromRSA(oRSAKeyMat.oPrivateKey, bEnc);
+Byte[] bDec = provider.Decrypt(bEnc);
+bDec = decryptor.Decrypt(bEnc);
 ```
 
 ## Windows Local
 
-#### Entropy Generation
-
-![Availability](https://badgen.net/badge/Availability/NETFRAMEWORK/green)
-
-`WindowsLocal.generateEntropy` is used to generate optional entropy which can be used when encrypting or decrypting using DPAPI. DPAPI entropy does not have a length limit, by default this function generates 32-bytes of entropy however the amount of entropy can be specified when calling the function. The returned entropy is pseudo-random (using `Rfc2898DeriveBytes`). The entropy is high quality but also using a string seed guarantees that if the function is called somewhere else with the same seed that the same entropy will be generated.
-
-```cs
-// Default 32-byte entropy
-Byte[] bEntropy = WindowsLocal.generateEntropy("Hello Entropy");
-
-// Custom 100-byte entropy
-Byte[] bEntropy = WindowsLocal.generateEntropy("Hello Entropy", 100);
-```
-
-#### DPAPI Local Machine
+### DPAPI Local Machine
 
 ![Availability](https://badgen.net/badge/Availability/NETFRAMEWORK/green)
 
 Data that is encrypted and decrypted is scoped to the machine. Data cannot be decrypted off-host.
 
 ```cs
-// Without entropy
-Byte[] bEnc = WindowsLocal.toMachineDPAPI(bSampleData);
-Byte[] bDec = WindowsLocal.fromMachineDPAPI(bEnc);
+using AdvSim.Cryptography.Windows;
 
-// With entropy
-Byte[] bEntropy = WindowsLocal.generateEntropy("Hello Entropy");
-Byte[] bEnc = WindowsLocal.toMachineDPAPI(bSampleData, bEntropy);
-Byte[] bDec = WindowsLocal.fromMachineDPAPI(bEnc, bEntropy);
+string message = "Hello world!";
+byte[] bMessage = System.Text.Encoding.UTF8.GetBytes(message);
+
+// Without entropy
+MachineDPAPIProvider prov = new MachineDPAPIProvider();
+// With entropy (default 32 bytes in length)
+MachineDPAPIProvider prov = new MachineDPAPIProvider("Hello Entropy");
+
+Byte[] bEnc = prov.Encrypt(bMessage);
+Byte[] bDec = prov.Decrypt(bEnc);
 ```
 
 #### DPAPI Current User
@@ -218,14 +266,18 @@ Byte[] bDec = WindowsLocal.fromMachineDPAPI(bEnc, bEntropy);
 Data that is encrypted and decrypted is scoped to the current user. Data cannot be decrypted in a different user context.
 
 ```cs
-// Without entropy
-Byte[] bEnc = WindowsLocal.toUserDPAPI(bSampleData);
-Byte[] bDec = WindowsLocal.fromUserDPAPI(bEnc);
+using AdvSim.Cryptography.Windows;
 
-// With entropy
-Byte[] bEntropy = WindowsLocal.generateEntropy("Hello Entropy");
-Byte[] bEnc = WindowsLocal.toUserDPAPI(bSampleData, bEntropy);
-Byte[] bDec = WindowsLocal.fromUserDPAPI(bEnc, bEntropy);
+string message = "Hello world!";
+byte[] bMessage = System.Text.Encoding.UTF8.GetBytes(message);
+
+// Without entropy
+UserDPAPIProvider prov = new UserDPAPIProvider();
+// With entropy (default 32 bytes in length)
+UserDPAPIProvider prov = new UserDPAPIProvider("Hello Entropy");
+
+Byte[] bEnc = prov.Encrypt(bMessage);
+Byte[] bDec = prov.Decrypt(bEnc);
 ```
 
 ## Miscellaneous
@@ -239,16 +291,23 @@ A time-based one-time password (TOTP) can be used as a an additional check when 
 #### Usage
 
 ```cs
-// Generate a TOTP using a string seed
-Miscellaneous.TOTP oTOTP = Miscellaneous.generateTOTP("Hello World");
-Console.WriteLine("[+] TOPT Code     : "  + oTOTP.Code);
-Console.WriteLine("[+] TOPT Last Code: "  + oTOTP.LastCode);
-Console.WriteLine("[+] TOPT Validity : "  + oTOTP.Seconds);
+using AdvSim.Cryptography.Miscellaneous;
+
+string seed = "Hello, World!";
+
+// Generate client/server TOTP objects using the same seed
+TOTP oClientTOTP = new TOTP(seed);
+TOTP oServerTOTP = new TOTP(seed);
+
+// Show current codes
+Console.WriteLine("[+] TOPT Code     : "  + oServerTOTP.Code);
+Console.WriteLine("[+] TOPT Last Code: "  + oServerTOTP.LastCode);
+Console.WriteLine("[+] TOPT Validity : "  + oServerTOTP.Seconds);
 
 // Validate TOTP based on string seed
-Boolean bValid = Miscellaneous.validateTOTP("Hello World", oTOTP.Code);
+Boolean bValid = oServerTOTP.Validate(oClientTOTP.Code);
 
 // Validate TOTP with forgiveness, this allows the previous TOTP
 // to also be counted as valid
-Boolean bValid = Miscellaneous.validateTOTP("Hello World", oTOTP.Code, true);
+Boolean bValid = oServerTOTP.Validate(oClientTOTP.Code, true);
 ```

@@ -6,4 +6,5 @@ C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\
 C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.csproj.CoreCompileInputs.cache
 C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.dll
 C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.pdb
-C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.csprojAssemblyReference.cache
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.csproj.AssemblyReference.cache
+C:\Users\User\Tools\AdvSim.Cryptography\AdvSim.Cryptography\AdvSim.Cryptography\obj\Release\netstandard2.0\AdvSim.Cryptography.GeneratedMSBuildEditorConfig.editorconfig

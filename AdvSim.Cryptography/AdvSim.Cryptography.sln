@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32428.249
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvSim.Cryptography", "AdvSim.Cryptography\AdvSim.Cryptography.csproj", "{294FCDD1-369E-4A7A-82C4-68EAA0CC6B24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AdvSim.Cryptography", "AdvSim.Cryptography\AdvSim.Cryptography.csproj", "{294FCDD1-369E-4A7A-82C4-68EAA0CC6B24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdvSim.Cryptography.Test", "AdvSim.Cryptography.Test\AdvSim.Cryptography.Test.csproj", "{FB40804F-A736-4229-8438-27F19C8E200F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{294FCDD1-369E-4A7A-82C4-68EAA0CC6B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{294FCDD1-369E-4A7A-82C4-68EAA0CC6B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{294FCDD1-369E-4A7A-82C4-68EAA0CC6B24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB40804F-A736-4229-8438-27F19C8E200F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB40804F-A736-4229-8438-27F19C8E200F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB40804F-A736-4229-8438-27F19C8E200F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB40804F-A736-4229-8438-27F19C8E200F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
