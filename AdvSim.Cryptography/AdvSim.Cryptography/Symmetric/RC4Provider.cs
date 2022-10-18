@@ -8,22 +8,38 @@ namespace AdvSim.Cryptography.Symmetric
 {
     public class RC4Provider : ICryptographicProvider
     {
+        /// <summary>
+        /// RC4 encryption key used to encrypt and decrypt data.
+        /// </summary>
         public byte[] Key { get; private set; }
 
-        public RC4Provider(string Password)
+        /// <summary>
+        /// Derive RC4 encryption material based on a shared secret.
+        /// </summary>
+        /// <param name="password">Shared secret to derive RC4 encryption key from.</param>
+        public RC4Provider(string password)
         {
             Rfc2898DeriveBytes oRfc2898DeriveBytes = new Rfc2898DeriveBytes(
-                Encoding.UTF32.GetBytes(Password),
-                Encoding.UTF32.GetBytes(Password).Reverse().ToArray(),
+                Encoding.UTF32.GetBytes(password),
+                Encoding.UTF32.GetBytes(password).Reverse().ToArray(),
                 10);
             Key = oRfc2898DeriveBytes.GetBytes(256);
         }
 
-        public RC4Provider(byte[] Key)
+        /// <summary>
+        /// Set the encryption key of the RC4 cryptor to the given key.
+        /// </summary>
+        /// <param name="key">Encryption key used in RC4 encryption.</param>
+        public RC4Provider(byte[] key)
         {
-            this.Key = Key;
+            this.Key = key;
         }
 
+        /// <summary>
+        /// Encrypt a plaintext message using RC4 encryption.
+        /// </summary>
+        /// <param name="bMessage">Plaintext message to encrypt.</param>
+        /// <returns>RC4 encrypted byte array.</returns>
         public byte[] Encrypt(byte[] bMessage)
         {
             Int32 a, i, j;
@@ -60,6 +76,11 @@ namespace AdvSim.Cryptography.Symmetric
             return cipher;
         }
 
+        /// <summary>
+        /// Decrypt a plaintext message using RC4 decryption.
+        /// </summary>
+        /// <param name="bMessage">RC4 encrypted message.</param>
+        /// <returns>Plaintext message as a byte array.</returns>
         public byte[] Decrypt(byte[] bMessage)
         {
             return Encrypt(bMessage);

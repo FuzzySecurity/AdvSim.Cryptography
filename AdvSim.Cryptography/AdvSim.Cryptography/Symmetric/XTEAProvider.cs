@@ -7,16 +7,41 @@ using System.Text;
 
 namespace AdvSim.Cryptography.Symmetric
 {
+    /// <summary>
+    /// Create an XTEA cryptographic object to encrypt and decrypt data.
+    /// </summary>
     public class XTEAProvider : ICryptographicProvider
     {
+        /// <summary>
+        /// Key used to encrypt and decrypt messages.
+        /// </summary>
         public byte[] Key { get; private set; }
 
-        public XTEAProvider(string Password, int KeySize = 100)
+        /// <summary>
+        /// Instantiate an XTEAProvider using a key derived from a shared secret.
+        /// </summary>
+        /// <param name="password">Shared secret to derive keys from.</param>
+        /// <param name="keySize">Length of the key to derive.</param>
+        public XTEAProvider(string password, int keySize = 100)
         {
-            Rfc2898DeriveBytes oRfc2898DeriveBytes = new Rfc2898DeriveBytes(Encoding.UTF32.GetBytes(Password), Encoding.UTF32.GetBytes(Password).Reverse().ToArray(), 10);
-            Key = oRfc2898DeriveBytes.GetBytes(KeySize);
+            Rfc2898DeriveBytes oRfc2898DeriveBytes = new Rfc2898DeriveBytes(Encoding.UTF32.GetBytes(password), Encoding.UTF32.GetBytes(password).Reverse().ToArray(), 10);
+            Key = oRfc2898DeriveBytes.GetBytes(keySize);
         }
 
+        /// <summary>
+        /// Instantiate an XTEAProvider using the specified encryption key.
+        /// </summary>
+        /// <param name="key">Encryption key used to encrypt and decrypt data with.</param>
+        public XTEAProvider(byte[] key)
+        {
+            Key = key;
+        }
+
+        /// <summary>
+        /// Decrypt an encrypted XTEA message.
+        /// </summary>
+        /// <param name="bMessage">Message encrypted with XTEA encryption.</param>
+        /// <returns>Plaintext message as a byte array.</returns>
         public byte[] Decrypt(byte[] bMessage)
         {
             Byte[] keyBuffer = Key;
@@ -54,6 +79,11 @@ namespace AdvSim.Cryptography.Symmetric
             return result;
         }
 
+        /// <summary>
+        /// Encrypt a plaintext message with XTEA encryption.
+        /// </summary>
+        /// <param name="bMessage">Plaintext message to encrypt.</param>
+        /// <returns>XTEA encrypted message.</returns>
         public byte[] Encrypt(byte[] bMessage)
         {
             Byte[] keyBuffer = Key;

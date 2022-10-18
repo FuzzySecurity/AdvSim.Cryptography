@@ -12,29 +12,17 @@ namespace AdvSim.Cryptography.Test
         [TestMethod]
         public void TestMachineDPAPIProvider()
         {
-            WindowsIdentity identity = WindowsIdentity.GetCurrent();
-            WindowsPrincipal principal = new WindowsPrincipal(identity);
-            // Requires high integrity
-            if (principal.IsInRole(WindowsBuiltInRole.Administrator))
-            {
-                MachineDPAPIProvider provider = new MachineDPAPIProvider();
-                ICryptographicProviderTest tester = new ICryptographicProviderTest(provider);
-                tester.Test();
-            }
+            MachineDPAPIProvider provider = new MachineDPAPIProvider();
+            ICryptographicProviderTest tester = new ICryptographicProviderTest(provider);
+            tester.Test();
         }
 
         [TestMethod]
         public void TestMachineDPAPIProviderWithSeed()
         {
-            WindowsIdentity identity = WindowsIdentity.GetCurrent();
-            WindowsPrincipal principal = new WindowsPrincipal(identity);
-            // Requires high integrity
-            if (principal.IsInRole(WindowsBuiltInRole.Administrator))
-            {
-                MachineDPAPIProvider provider = new MachineDPAPIProvider(_entropyString);
-                ICryptographicProviderTest tester = new ICryptographicProviderTest(provider);
-                tester.Test();
-            }
+            MachineDPAPIProvider provider = new MachineDPAPIProvider(_entropyString);
+            ICryptographicProviderTest tester = new ICryptographicProviderTest(provider);
+            tester.Test();
         }
 
         [TestMethod]

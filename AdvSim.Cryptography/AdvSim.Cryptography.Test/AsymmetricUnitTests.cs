@@ -1,4 +1,5 @@
 ﻿using AdvSim.Cryptography.Asymmetric;
+using AdvSim.Cryptography.Asymmetric.Extensions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -88,7 +89,7 @@ namespace AdvSim.Cryptography.Test
             ICryptographicProviderTest tester = new ICryptographicProviderTest(server);
             tester.Test();
 
-            byte[] bPub = server.ExportPublicKey();
+            byte[] bPub = server.PublicKey.GetBytes();
             Assert.AreNotEqual(bPub.Length, 0, "Failed to export public key as bytes.");
 
             RSAProvider client = new RSAProvider(bPub);

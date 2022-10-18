@@ -5,7 +5,7 @@ using System;
 namespace AdvSim.Cryptography.Test
 {
     [TestClass]
-    public class MischellaneousUnitTests
+    public class MiscellaneousUnitTests
     {
         private const string _seed = "MyVeryCoolSeedValue";
         [TestMethod]
