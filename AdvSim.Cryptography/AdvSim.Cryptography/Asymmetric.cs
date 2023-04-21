@@ -1,97 +1,169 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
+using System.Xml.Linq;
 
 namespace AdvSim.Cryptography
 {
-    public class Asymmetric
+    public class RSA
     {
-        // Crypto Data types
-        //============================
-
-        /// <summary>
-        /// ECDH key material containing Key/IV.
-        /// </summary>
-        public class ECDH_KEY_MAT
-        {
-            public Byte[] bKey;
-            public Byte[] bIV;
-        }
-
-        /// <summary>
-        /// RSA key material containing certificate public/private keypair.
-        /// </summary>
-        public class RSA_KEY_MAT
-        {
-            public RSAParameters oPublicKey;
-            public RSAParameters oPrivateKey;
-        }
-
-        // Crypto functions
-        //============================
+        internal static hCrypto.RSA_KEY_MATERIAL KeyMaterial = null;
         
-#if NETFRAMEWORK || (NET6_0_OR_GREATER && WINDOWS)
-        
-        // ECDH
-        //---------------------
-
         /// <summary>
-        /// Generate a random ECDH public/private 521-bit keypair.
+        /// Convert an RSAParameters public key object to a byte array.
         /// </summary>
-        /// <returns>RSA_KEY_MAT</returns>
-        public static ECDiffieHellmanCng initializeECDH()
-        {
-            ECDiffieHellmanCng ecdh = new ECDiffieHellmanCng(521);
-            ecdh.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
-            ecdh.HashAlgorithm = CngAlgorithm.Sha256;
-
-            return ecdh;
-        }
-
-        /// <summary>
-        /// Retrieve the ECDH public key from an initialized ECDiffieHellmanCng object.
-        /// </summary>
-        /// <param name="ecdh">Initialized ECDiffieHellmanCng object.</param>
         /// <returns>Byte[]</returns>
-        public static Byte[] getECDHPublicKey(ECDiffieHellmanCng ecdh)
+        public Byte[] GetPublicKeyArray()
         {
-            return ecdh.PublicKey.ToByteArray();
+            using (StringWriter sw = new StringWriter())
+            {
+                new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters)).Serialize(sw, KeyMaterial.PublicKey);
+                return System.Text.Encoding.UTF8.GetBytes(sw.ToString());
+            }
+        }
+        
+        /// <summary>
+        /// Convert a byte array to an RSAParameters key object.
+        /// </summary>
+        /// <param name="bKey">RSA key in a byte array format.</param>
+        /// <returns>RSAParameters</returns>
+        internal RSAParameters ConvertArrayToRSAParameters(Byte[] bKeyObject)
+        {
+            using (StringReader sr = new StringReader(System.Text.Encoding.UTF8.GetString(bKeyObject)))
+            {
+                return (RSAParameters)new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters)).Deserialize(sr);
+            }
+        }
+        
+        /// <summary>
+        /// Encrypt a byte array using an RSA certificate public key.
+        /// </summary>
+        /// <param name="bPublicKey">RSA public key.</param>
+        /// <param name="bData">Byte array which will be encrypted.</param>
+        /// <returns>Byte[]</returns>
+        public Byte[] Encrypt(Byte[] bPublicKey, Byte[] bData)
+        {
+            RSACryptoServiceProvider oRSAProvider = new RSACryptoServiceProvider();
+            RSAParameters oPublicKey = ConvertArrayToRSAParameters(bPublicKey);
+            oRSAProvider.ImportParameters(oPublicKey);
+
+            return oRSAProvider.Encrypt(bData, false);
+        }
+
+        /// <summary>
+        /// Decrypt a byte array using an RSA certificate private key.
+        /// </summary>
+        /// <param name="bData">Byte array which will be decrypted.</param>
+        /// <returns>Byte[]</returns>
+        public Byte[] Decrypt(Byte[] bData)
+        {
+            RSACryptoServiceProvider oRSAProvider = new RSACryptoServiceProvider();
+            oRSAProvider.ImportParameters(KeyMaterial.PrivateKey);
+
+            return oRSAProvider.Decrypt(bData, false);
+        }
+        
+        public RSA()
+        {
+            KeyMaterial = new hCrypto.RSA_KEY_MATERIAL();
+            RSACryptoServiceProvider oRSAProvider = new RSACryptoServiceProvider(4096);
+            KeyMaterial.PrivateKey = oRSAProvider.ExportParameters(true);
+            KeyMaterial.PublicKey = oRSAProvider.ExportParameters(false);
+        }
+    }
+
+    public class ECDH
+    {
+#if NET47_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER // NET47_OR_GREATER
+        internal static ECDiffieHellman ecdh = null;
+        internal static ECCurveType Curve;
+        internal static hCrypto.ECDH_KEY_MATERIAL oKeyMat = new hCrypto.ECDH_KEY_MATERIAL();
+
+        /// <summary>
+        /// ECCurveType enum defining supported elliptic curve cryptography algorithms.
+        /// </summary>
+        public enum ECCurveType
+        {
+            brainpoolP160r1,
+            brainpoolP160t1,
+            brainpoolP192r1,
+            brainpoolP192t1,
+            brainpoolP224r1,
+            brainpoolP224t1,
+            brainpoolP256r1,
+            brainpoolP256t1,
+            brainpoolP320r1,
+            brainpoolP320t1,
+            brainpoolP384r1,
+            brainpoolP384t1,
+            brainpoolP512r1,
+            brainpoolP512t1,
+            nistP256,
+            nistP384,
+            nistP521
+        }
+
+        internal ECDiffieHellman ImportPublicParameters(Byte[] bPublicKey)
+        {
+            String sPublicKey = Encoding.UTF8.GetString(bPublicKey);
+            String[] parts = sPublicKey.Split(';');
+            Byte[] xBytes = Convert.FromBase64String(parts[0]);
+            Byte[] yBytes = Convert.FromBase64String(parts[1]);
+        
+            ECParameters ecParameters = new ECParameters
+            {
+                Curve = ECCurve.CreateFromFriendlyName(Enum.GetName(typeof(ECCurveType), Curve)),
+                Q = new ECPoint { X = xBytes, Y = yBytes }
+            };
+    
+            ECDiffieHellman ecdhParam = ECDiffieHellman.Create();
+            ecdhParam.ImportParameters(ecParameters);
+    
+            return ecdhParam;
+        }
+
+        /// <summary>
+        /// Retrieve the ECDH public key from an initialized ECDiffieHellman object.
+        /// </summary>
+        /// <returns>Byte[]</returns>
+        public Byte[] GetPublicKeyArray()
+        {
+            ECParameters ecParameters = ecdh.ExportParameters(false);
+            Byte[] xBytes = ecParameters.Q.X;
+            Byte[] yBytes = ecParameters.Q.Y;
+            return Encoding.UTF8.GetBytes(Convert.ToBase64String(xBytes) + ";" + Convert.ToBase64String(yBytes));
         }
 
         /// <summary>
         /// Generate a shared secret Key/IV from an initialized ECDiffieHellmanCng object and a public key.
         /// </summary>
-        /// <param name="ecdh">Initialized ECDiffieHellmanCng object.</param>
         /// <param name="publicKey">Public key byte array received during client exchange.</param>
-        /// <returns>Byte[]</returns>
-        public static ECDH_KEY_MAT deriveECDHSharedKeyMaterial(ECDiffieHellmanCng ecdh, Byte[] publicKey)
+        public void DeriveSharedKey(Byte[] publicKey)
         {
-            ECDH_KEY_MAT oKeyMat = new ECDH_KEY_MAT();
+            // Convert public key string to ECDiffieHellman public key
+            ECDiffieHellman ecdhPublicKey = ImportPublicParameters(publicKey);
             
-            // Note: You can only get 32-bytes of derived key material from this operation.
-            Byte[] sharedSecret = ecdh.DeriveKeyMaterial(CngKey.Import(publicKey, CngKeyBlobFormat.EccPublicBlob));
+            // Derive shared secret
+            Byte[] sharedSecret = ecdh.DeriveKeyMaterial(ecdhPublicKey.PublicKey);
+            oKeyMat.Key = new Byte[16];
+            oKeyMat.IV = new Byte[16];
             
-            oKeyMat.bKey = new Byte[16];
-            oKeyMat.bIV = new Byte[16];
-
-            Array.Copy(sharedSecret, 0, oKeyMat.bKey, 0, 16);
-            Array.Copy(sharedSecret, 16, oKeyMat.bIV, 0, 16);
-
-            return oKeyMat;
+            Array.Copy(sharedSecret, 0, oKeyMat.Key, 0, 16);
+            Array.Copy(sharedSecret, 16, oKeyMat.IV, 0, 16);
         }
 
         /// <summary>
         /// Encrypt a byte array using AES with key material derived from an ECDH key exchange.
         /// </summary>
-        /// <param name="oKeyMat">Key material used for the cryptographic operation.</param>
-        /// <param name="bMessage">Byte array which will be encrypted.</param>
+        /// <param name="bData">Byte array which will be encrypted.</param>
         /// <returns>Byte[]</returns>
-        public static Byte[] toECDH(ECDH_KEY_MAT oKeyMat, Byte[] bMessage)
+        public Byte[] Encrypt(Byte[] bData)
         {
             using (Aes aes = Aes.Create())
             {
-                aes.Key = oKeyMat.bKey;
-                aes.IV = oKeyMat.bIV;
+                aes.Key = oKeyMat.Key;
+                aes.IV = oKeyMat.IV;
 
                 ICryptoTransform enc = aes.CreateEncryptor(aes.Key, aes.IV);
                 using (MemoryStream ms = new MemoryStream())
@@ -100,7 +172,7 @@ namespace AdvSim.Cryptography
                     {
                         using (BinaryWriter sw = new BinaryWriter(cs))
                         {
-                            sw.Write(bMessage);
+                            sw.Write(bData);
                         }
                         return ms.ToArray();
                     }
@@ -111,15 +183,14 @@ namespace AdvSim.Cryptography
         /// <summary>
         /// Decrypt a byte array using AES with key material derived from an ECDH key exchange.
         /// </summary>
-        /// <param name="oKeyMat">Key material used for the cryptographic operation.</param>
-        /// <param name="bMessage">Byte array which will be encrypted.</param>
+        /// <param name="bData">Byte array which will be encrypted.</param>
         /// <returns>Byte[]</returns>
-        public static Byte[] fromECDH(ECDH_KEY_MAT oKeyMat, Byte[] bMessage)
+        public Byte[] Decrypt(Byte[] bData)
         {
             using (Aes aes = Aes.Create())
             {
-                aes.Key = oKeyMat.bKey;
-                aes.IV = oKeyMat.bIV;
+                aes.Key = oKeyMat.Key;
+                aes.IV = oKeyMat.IV;
 
                 ICryptoTransform dec = aes.CreateDecryptor(aes.Key, aes.IV);
                 using (MemoryStream ms = new MemoryStream())
@@ -128,7 +199,7 @@ namespace AdvSim.Cryptography
                     {
                         using (BinaryWriter sw = new BinaryWriter(cs))
                         {
-                            sw.Write(bMessage);
+                            sw.Write(bData);
                         }
                         return ms.ToArray();
                     }
@@ -136,79 +207,98 @@ namespace AdvSim.Cryptography
             }
         }
         
-#endif
+        public ECDH(ECCurveType curveType)
+        {
+            Curve = curveType;
+            ecdh = ECDiffieHellman.Create(ECCurve.CreateFromFriendlyName(Enum.GetName(typeof(ECCurveType), curveType)));
+        }
+#elif NETFRAMEWORK
+        internal static ECDiffieHellmanCng ecdhCng = null;
+        internal static hCrypto.ECDH_KEY_MATERIAL oKeyMat = new hCrypto.ECDH_KEY_MATERIAL();
+
+        /// <summary>
+        /// Retrieve the ECDH public key from an initialized ECDiffieHellmanCng object.
+        /// </summary>
+        /// <returns>Byte[]</returns>
+        public Byte[] GetPublicKeyArray()
+        {
+            return ecdhCng.PublicKey.ToByteArray();
+        }
         
-        // RSA
-        //---------------------
-
         /// <summary>
-        /// Generate a random RSAParameters public/private 4096-bit keypair.
+        /// Generate a shared secret Key/IV from an initialized ECDiffieHellmanCng object and a public key.
         /// </summary>
-        /// <returns>RSA_KEY_MAT</returns>
-        public static RSA_KEY_MAT initializeRSA()
+        /// <param name="publicKey">Public key byte array received during client exchange.</param>
+        public void DeriveSharedKey(Byte[] publicKey)
         {
-            RSA_KEY_MAT oRSA = new RSA_KEY_MAT();
-
-            RSACryptoServiceProvider oRSAProvider = new RSACryptoServiceProvider(4096);
-            oRSA.oPrivateKey = oRSAProvider.ExportParameters(true);
-            oRSA.oPublicKey = oRSAProvider.ExportParameters(false);
-
-            return oRSA;
+            Byte[] sharedSecret = ecdhCng.DeriveKeyMaterial(CngKey.Import(publicKey, CngKeyBlobFormat.EccPublicBlob));
+            
+            oKeyMat.Key = new Byte[16];
+            oKeyMat.IV = new Byte[16];
+            Array.Copy(sharedSecret, 0, oKeyMat.Key, 0, 16);
+            Array.Copy(sharedSecret, 16, oKeyMat.IV, 0, 16);
         }
 
         /// <summary>
-        /// Convert an RSAParameters public/private key object to a byte array.
+        /// Encrypt a byte array using AES with key material derived from an ECDH key exchange.
         /// </summary>
-        /// <param name="oKey">RSA key in an RSAParameters format.</param>
+        /// <param name="bData">Byte array which will be encrypted.</param>
         /// <returns>Byte[]</returns>
-        public static Byte[] getArrayFromRSAParameters(RSAParameters oKey)
+        public Byte[] Encrypt(Byte[] bData)
         {
-            using (StringWriter sw = new StringWriter())
+            using (Aes aes = Aes.Create())
             {
-                new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters)).Serialize(sw, oKey);
-                return System.Text.Encoding.UTF8.GetBytes(sw.ToString());
+                aes.Key = oKeyMat.Key;
+                aes.IV = oKeyMat.IV;
+
+                ICryptoTransform enc = aes.CreateEncryptor(aes.Key, aes.IV);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, enc, CryptoStreamMode.Write))
+                    {
+                        using (BinaryWriter sw = new BinaryWriter(cs))
+                        {
+                            sw.Write(bData);
+                        }
+                        return ms.ToArray();
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Convert a byte array to an RSAParameters public/private key object.
+        /// Decrypt a byte array using AES with key material derived from an ECDH key exchange.
         /// </summary>
-        /// <param name="bKey">RSA key in a byte array format.</param>
-        /// <returns>RSAParameters</returns>
-        public static RSAParameters getRSAParametersFromArray(Byte[] bKey)
+        /// <param name="bData">Byte array which will be encrypted.</param>
+        /// <returns>Byte[]</returns>
+        public Byte[] Decrypt(Byte[] bData)
         {
-            using (StringReader sr = new StringReader(System.Text.Encoding.UTF8.GetString(bKey)))
+            using (Aes aes = Aes.Create())
             {
-                return (RSAParameters)new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters)).Deserialize(sr);
+                aes.Key = oKeyMat.Key;
+                aes.IV = oKeyMat.IV;
+
+                ICryptoTransform dec = aes.CreateDecryptor(aes.Key, aes.IV);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cs = new CryptoStream(ms, dec, CryptoStreamMode.Write))
+                    {
+                        using (BinaryWriter sw = new BinaryWriter(cs))
+                        {
+                            sw.Write(bData);
+                        }
+                        return ms.ToArray();
+                    }
+                }
             }
         }
-
-        /// <summary>
-        /// Encrypt a byte array using an RSA certificate public key.
-        /// </summary>
-        /// <param name="oPublicKey">RSA public key in an RSAParameters format.</param>
-        /// <param name="bMessage">Byte array which will be encrypted.</param>
-        /// <returns>Byte[]</returns>
-        public static Byte[] toRSA(RSAParameters oPublicKey, Byte[] bMessage)
+        
+        public ECDH()
         {
-            RSACryptoServiceProvider oRSAProvider = new RSACryptoServiceProvider();
-            oRSAProvider.ImportParameters(oPublicKey);
-
-            return oRSAProvider.Encrypt(bMessage, false);
+            ecdhCng = new ECDiffieHellmanCng(256);
+            ecdhCng.KeyDerivationFunction = ECDiffieHellmanKeyDerivationFunction.Hash;
+            ecdhCng.HashAlgorithm = CngAlgorithm.Sha256;
         }
-
-        /// <summary>
-        /// Decrypt a byte array using an RSA certificate private key.
-        /// </summary>
-        /// <param name="oPrivateKey">RSA private key in an RSAParameters format.</param>
-        /// <param name="bMessage">Byte array which will be decrypted.</param>
-        /// <returns>Byte[]</returns>
-        public static Byte[] fromRSA(RSAParameters oPrivateKey, Byte[] bMessage)
-        {
-            RSACryptoServiceProvider oRSAProvider = new RSACryptoServiceProvider();
-            oRSAProvider.ImportParameters(oPrivateKey);
-
-            return oRSAProvider.Decrypt(bMessage, false);
-        }
+#endif
     }
 }

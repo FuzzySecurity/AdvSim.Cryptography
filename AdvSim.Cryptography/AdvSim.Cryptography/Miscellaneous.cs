@@ -5,15 +5,14 @@ using System.Text;
 
 namespace AdvSim.Cryptography
 {
-    public class Miscellaneous
+    public class TOTP
     {
-        // Misc Data types
-        //============================
+        internal static String sSeed = String.Empty;
 
         /// <summary>
         /// TOTP object containing properties of the TOTP generator.
         /// </summary>
-        public class TOTP
+        public class OTP
         {
             public UInt32 Seconds;
             public UInt32 Code;
@@ -28,10 +27,10 @@ namespace AdvSim.Cryptography
         /// </summary>
         /// <param name="sSeed">String seed used to generate pseudo-random HMACSHA256 value.</param>
         /// <returns>TOTP</returns>
-        public static TOTP generateTOTP(String sSeed)
+        public OTP GenerateTOTP()
         {
             // Create return object
-            TOTP oTOTP = new TOTP();
+            OTP oTOTP = new OTP();
 
             // Get DatTime
             DateTime dtNow = DateTime.UtcNow;
@@ -74,10 +73,10 @@ namespace AdvSim.Cryptography
         /// <param name="iCode">TOTP integer to validate.</param>
         /// <param name="bAllowLastCode">Allows the previous TOTP code to also be valid.</param>
         /// <returns>TOTP</returns>
-        public static Boolean validateTOTP(String sSeed, UInt32 iCode, Boolean bAllowLastCode = false)
+        public Boolean ValidateTOTP(UInt32 iCode, Boolean bAllowLastCode = false)
         {
             // Get TOTP
-            TOTP oTOTP = generateTOTP(sSeed);
+            OTP oTOTP = GenerateTOTP();
 
             // Check if code is valid
             if (oTOTP.Code == iCode || (bAllowLastCode && oTOTP.LastCode == iCode))
@@ -86,6 +85,11 @@ namespace AdvSim.Cryptography
             }
 
             return false;
+        }
+
+        public TOTP(String sEntropy)
+        {
+            sSeed = sEntropy;
         }
     }
 }
