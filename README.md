@@ -102,7 +102,7 @@ Byte[] bDecrypted = test.Decrypt(bEncrypted);
 This function takes a byte array and will either encrypt or decrypt it using the key material provided in the constructor. On completion it will return a byte array.
 
 ```cs
-XTEA test = new XTEA("jumanji");
+XTEA test = new XTEA("Lovecraft");
 Byte[] bEncrypted = test.Encrypt(bTestData);
 Byte[] bDecrypted = test.Decrypt(bEncrypted);
 ```
